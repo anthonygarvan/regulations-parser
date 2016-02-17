@@ -13,6 +13,7 @@ from regparser.notice.build import build_notice
 from regparser.tree.xml_parser.xml_wrapper import XMLWrapper
 import settings
 
+from time import sleep
 
 CFR_BULK_URL = ("https://www.gpo.gov/fdsys/bulkdata/CFR/{year}/title-{title}/"
                 "CFR-{year}-title{title}-vol{volume}.xml")
@@ -30,7 +31,13 @@ class Volume(namedtuple('Volume', ['year', 'title', 'vol_num'])):
     @property
     def response(self):
         if self._response is None:
-            self._response = requests.get(self.url, stream=True)
+            try:
+                self._response = requests.get(self.url, stream=True)
+            except Exception as e:
+                print e
+                print 'CONNECTION REFUSED ERROR- RETRYING IN 30 SECONDS'
+                sleep(30)
+                self._response = requests.get(self.url, stream=True)                
         return self._response
 
     @property
