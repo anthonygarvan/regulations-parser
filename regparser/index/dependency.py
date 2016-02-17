@@ -5,6 +5,7 @@ import shelve
 from dagger import dagger
 
 from . import ROOT
+from random import randint
 
 
 class Missing(Exception):
@@ -21,7 +22,7 @@ class Graph(object):
     `dependencies.db` for later retrieval. This lets us know that an output
     with dependencies needs to be updated if those dependencies have been
     updated"""
-    DB_FILE = os.path.join(ROOT, "dependencies.db")
+    DB_FILE = os.path.join(ROOT, "dependencies_%d.db" % randint(1,10000))
 
     def __init__(self):
         if not os.path.exists(ROOT):
