@@ -20,7 +20,7 @@ def worker():
 		if not os.path.exists(output_dir):
 			os.makedirs(output_dir)
 		print "processing %s, part %s, approximately %d left" % (title, part, q.qsize())
-		os.system('eregs pipeline %s %s %s --only-latest | tee parse.log' % (title_number, part, output_dir))
+		os.system('timeout 60 eregs pipeline %s %s %s --only-latest | tee parse.log' % (title_number, part, output_dir))
 		q.task_done()
 
 if os.path.exists('parse.log'):
