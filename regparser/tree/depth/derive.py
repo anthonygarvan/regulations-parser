@@ -79,7 +79,7 @@ def _decompress_markerless(assignment, marker_list):
     return result
 
 
-def derive_depths(original_markers, additional_constraints=[]):
+def derive_depths(original_markers, additional_constraints=[], max_solutions=1000):
     """Use constraint programming to derive the paragraph depths associated
     with a list of paragraph markers. Additional constraints (e.g. expected
     marker types, etc.) can also be added. Such constraints are functions of
@@ -143,6 +143,11 @@ def derive_depths(original_markers, additional_constraints=[]):
     for assignment in problem.getSolutionIter():
         assignment = _decompress_markerless(assignment, original_markers)
         solutions.append(Solution(assignment))
+
+        if len(solutions) > max_solutions:
+            print "MAX SOLUTIONS LIMIT REACHED"
+            break
+
     return solutions
 
 

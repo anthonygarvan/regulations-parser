@@ -5,6 +5,7 @@ import json
 from time import sleep
 import sys
 from getopt import getopt
+from random import shuffle, seed
 
 def worker():
 	while True:
@@ -22,6 +23,9 @@ def worker():
 		os.system('eregs pipeline %s %s %s --only-latest | tee parse.log' % (title_number, part, output_dir))
 		q.task_done()
 
+if os.path.exists('parse.log'):
+	os.remove('parse.log')
+
 num_worker_threads = 4
 opts, args = getopt(sys.argv[1:], "t:d")
 debug = False
@@ -35,14 +39,21 @@ all_parts = json.load(open('all_parts.json'))
 
 q = Queue()
 
+job_queue = []
 if debug:
 	for title in all_parts.keys()[:3]:
 		for part in all_parts[title][:3]:
-			q.put((title, part))
+			job_queue.append((title, part))
 else:
 	for title in all_parts:
 		for part in all_parts[title]:
-			q.put((title, part))
+			job_queue.append((title, part))
+
+seed(42)
+shuffle(job_queue)
+
+for item in job_queue:
+	q.put(item)
 
 for i in range(num_worker_threads):
 	t = Thread(target=worker)

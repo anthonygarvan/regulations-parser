@@ -35,8 +35,8 @@ class Volume(namedtuple('Volume', ['year', 'title', 'vol_num'])):
                 self._response = requests.get(self.url, stream=True)
             except Exception as e:
                 print e
-                print 'CONNECTION REFUSED ERROR- RETRYING IN 30 SECONDS'
-                sleep(30)
+                print 'HTTP CONNECTION ERROR- RETRYING IN 5 minutes'
+                sleep(300)
                 self._response = requests.get(self.url, stream=True)                
         return self._response
 
