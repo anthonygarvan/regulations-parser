@@ -22,8 +22,9 @@ def worker(thread_id):
 		output_dir = 'parsed/' + title
 		if not os.path.exists(output_dir):
 			os.makedirs(output_dir)
-		os.system("(echo processing %s, part %s, approximately %d left && date) >> status.log >> %d" % (title, part, q.qsize(), logfile))
+		os.system("(echo processing %s, part %s, approximately %d left && date) >> status.log >> %s" % (title, part, q.qsize(), logfile))
 		cmd = 'timeout 120 eregs pipeline %s %s %s --only-latest | tee -a %s' % (title_number, part, output_dir, logfile)
+		print cmd
 		os.system(cmd)
 		q.task_done()
 
