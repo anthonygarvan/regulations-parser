@@ -7,7 +7,10 @@ import sys
 from getopt import getopt
 from random import shuffle, seed
 
-def worker():
+def worker(thread_id):
+	logfile = 'parse_%d.log' % thread_id
+	if os.path.exists(logfile):
+		os.remove(logfile)
 	while True:
 		try: 
 			title, part = q.get(False)
@@ -19,12 +22,10 @@ def worker():
 		output_dir = 'parsed/' + title
 		if not os.path.exists(output_dir):
 			os.makedirs(output_dir)
-		print "processing %s, part %s, approximately %d left" % (title, part, q.qsize())
-		os.system('timeout 60 eregs pipeline %s %s %s --only-latest | tee parse.log' % (title_number, part, output_dir))
+		os.system("(echo processing %s, part %s, approximately %d left && date) >> status.log >> %d" % (title, part, q.qsize()), logfile)
+		cmd = 'timeout 120 eregs pipeline %s %s %s --only-latest | tee -a %s' % (title_number, part, output_dir, logfile)
+		os.system(cmd)
 		q.task_done()
-
-if os.path.exists('parse.log'):
-	os.remove('parse.log')
 
 num_worker_threads = 4
 opts, args = getopt(sys.argv[1:], "t:d")
@@ -56,7 +57,7 @@ for item in job_queue:
 	q.put(item)
 
 for i in range(num_worker_threads):
-	t = Thread(target=worker)
+	t = Thread(target=worker, args=[i])
 	t.daemon = True
 	t.start()
 
