@@ -63,3 +63,4 @@ for i in range(num_worker_threads):
 	t.start()
 
 q.join()       # block until all tasks are done
+os.system('cat parse_*.log > all_parses.log')
